@@ -32,16 +32,18 @@ export default function ReportScreen() {
   const [breakdown, setBreakdown] = useState([]);
   const [currentMonthItems, setCurrentMonthItems] = useState([]);
   const [constants, setConstants] = useState([]);
+  const [assetEntries, setAssetEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const fillAnim = useRef(new Animated.Value(0)).current;
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [m, b, c] = await Promise.all([api.getMonths(), api.getSpendingBreakdown(), api.getConstants()]);
+      const [m, b, c, a] = await Promise.all([api.getMonths(), api.getSpendingBreakdown(), api.getConstants(), api.getAssets()]);
       setMonths(m);
       setBreakdown(b);
       setConstants(c);
+      setAssetEntries(a.entries);
       const latest = m.length ? m[m.length - 1].month : null;
       if (latest) {
         const doc = await api.getMonth(latest);
@@ -79,6 +81,13 @@ export default function ReportScreen() {
   const categories = restTotal > 0 ? [...top, { name: "Diğer", total: restTotal }] : top;
   const pct = (n) => (breakdownTotal > 0 ? (n / breakdownTotal) * 100 : 0);
 
+  const savingsTotal = assetEntries.reduce((s, e) => s + e.quantity * e.unitPrice, 0);
+  const savingsPct = (n) => (savingsTotal > 0 ? (n / savingsTotal) * 100 : 0);
+  const savingsSegments = assetEntries
+    .map((e) => ({ name: e.name, value: e.quantity * e.unitPrice }))
+    .filter((s) => s.value > 0)
+    .sort((a, b) => b.value - a.value);
+
   const currentMonthKey = months.length ? months[months.length - 1].month : null;
   const constantNameById = (id) => constants.find((c) => c._id === id)?.name;
   const currentMonthCategoryTotals = new Map();
@@ -101,6 +110,42 @@ export default function ReportScreen() {
           <Text style={styles.heroSub}>
             {months.length} ay · aylık ortalama {formatMoney(avgPerMonth)} ₺
           </Text>
+        )}
+      </AnimatedCard>
+
+      <AnimatedCard delay={50} style={[styles.chartCard, cardShadow]}>
+        <Text style={styles.sectionLabel}>Toplam Birikim</Text>
+        <Text style={styles.savingsValue}>{formatMoney(savingsTotal)} ₺</Text>
+        {savingsSegments.length === 0 ? (
+          <Text style={styles.empty}>Henüz varlık kaydı yok.</Text>
+        ) : (
+          <>
+            <View style={styles.segmentTrack}>
+              <Animated.View
+                style={{
+                  flexDirection: "row",
+                  height: "100%",
+                  width: fillAnim.interpolate({ inputRange: [0, 1], outputRange: ["0%", "100%"] }),
+                }}
+              >
+                {savingsSegments.map((s, i) => (
+                  <View key={s.name} style={{ width: `${savingsPct(s.value)}%`, backgroundColor: CATEGORY_PALETTE[i % CATEGORY_PALETTE.length], height: "100%" }} />
+                ))}
+              </Animated.View>
+            </View>
+            <View style={styles.list}>
+              {savingsSegments.map((s, i) => (
+                <View key={s.name} style={styles.listRow}>
+                  <View style={[styles.dot, { backgroundColor: CATEGORY_PALETTE[i % CATEGORY_PALETTE.length] }]} />
+                  <Text style={styles.listName} numberOfLines={1}>
+                    {s.name}
+                  </Text>
+                  <Text style={styles.listPct}>{savingsPct(s.value).toFixed(1)}%</Text>
+                  <Text style={styles.listValue}>{formatMoney(s.value)} ₺</Text>
+                </View>
+              ))}
+            </View>
+          </>
         )}
       </AnimatedCard>
 
@@ -182,6 +227,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   sectionLabel: { color: colors.textDim, fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: spacing.md },
+  savingsValue: { color: colors.mint, fontSize: 26, fontWeight: "800", marginBottom: spacing.md },
   empty: { color: colors.textDim, textAlign: "center", paddingVertical: spacing.xl },
   segmentTrack: {
     width: "100%",
