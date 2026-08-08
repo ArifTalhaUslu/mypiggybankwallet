@@ -233,9 +233,14 @@ export default function MonthlyScreen() {
 
   // On PC, a horizontal ScrollView only responds to touch/scrollbar drag by default —
   // add mouse wheel scrolling (smooth glide, not per-notch jumps) and click-drag
-  // panning, like any native horizontal carousel.
+  // panning, like any native horizontal carousel. Skipped entirely on touch devices:
+  // phones synthesize mousedown/mousemove from real touches, and a global window-level
+  // "mousemove" listener reacting to that hijacked normal page scrolling on iOS Safari.
   useEffect(() => {
     if (Platform.OS !== "web" || stripData.length < 2) return;
+    const isTouchPrimary = typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)")?.matches;
+    if (isTouchPrimary) return;
+
     const node = stripRef.current?.getScrollableNode?.() ?? stripRef.current;
     if (!node) return;
 
