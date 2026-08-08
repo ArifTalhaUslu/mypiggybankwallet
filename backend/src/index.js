@@ -13,6 +13,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// This is an API-only server — the app itself runs on your phone/browser via Expo,
+// not here. Seeing this at the root URL means the backend is up and healthy.
+app.get("/", (req, res) => res.send("Piggybank API çalışıyor. Bu sadece backend — uygulamayı Expo ile aç."));
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 app.use("/api/auth", authRouter);
 
