@@ -53,8 +53,37 @@ function useWebScrollbarStyle() {
   }, []);
 }
 
+// On iPhone Safari, a fresh portrait load sometimes measures the viewport wrong for
+// about a second before correcting itself, shifting the whole page left — manually
+// rotating the phone fixes it because rotation forces Safari to re-measure. This
+// does that same re-measurement + re-centering in software, automatically, on load.
+function useIOSViewportShiftGuard() {
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    const snapBack = () => {
+      if (document.documentElement.scrollLeft !== 0) document.documentElement.scrollLeft = 0;
+      if (document.body.scrollLeft !== 0) document.body.scrollLeft = 0;
+    };
+    const remeasure = () => {
+      snapBack();
+      window.dispatchEvent(new Event("resize"));
+    };
+    window.addEventListener("scroll", snapBack, { passive: true });
+    window.addEventListener("pageshow", remeasure);
+    document.addEventListener("visibilitychange", remeasure);
+    const timers = [300, 1200, 2000].map((ms) => setTimeout(remeasure, ms));
+    return () => {
+      window.removeEventListener("scroll", snapBack);
+      window.removeEventListener("pageshow", remeasure);
+      document.removeEventListener("visibilitychange", remeasure);
+      timers.forEach(clearTimeout);
+    };
+  }, []);
+}
+
 export default function App() {
   useWebScrollbarStyle();
+  useIOSViewportShiftGuard();
   const [authState, setAuthState] = useState("checking"); // "checking" | "out" | "in"
 
   useEffect(() => {
