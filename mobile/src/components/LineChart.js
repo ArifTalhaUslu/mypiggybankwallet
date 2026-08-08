@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions, Platform } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import Svg, { Line, Polyline, Circle } from "react-native-svg";
 import { colors, radius, spacing, maxContentWidth } from "../theme";
 import { formatMoney } from "../utils/format";
@@ -12,12 +12,34 @@ const OUTER_PADDING = spacing.lg * 2 + spacing.lg * 2;
 const MIN_VISIBLE = 4; // can't zoom in past this many points
 const ZOOM_STEP = 0.7; // each +/- press or wheel notch shrinks/grows the window by this factor
 
+// RN's useWindowDimensions can report a stale/zero width on web right after a tab
+// switch (its internal listener doesn't always refire), even though the DOM's own
+// window.innerWidth is correct — read that directly instead and keep it in sync via
+// a real 'resize' listener.
+function useReliableWindowWidth() {
+  const [width, setWidth] = useState(() => (Platform.OS === "web" ? window.innerWidth : 0));
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    const onResize = () => setWidth(window.innerWidth);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return width;
+}
+
 // Single-series time line: thin accent stroke, recessive gridlines, no per-point
 // clutter. Zoomable — wheel (desktop) or pinch (touch) to zoom, drag to pan once
 // zoomed in, tap/scrub to inspect a point via the crosshair tooltip.
 export default function LineChart({ data, labelFor, formatValue = formatMoney, zoomable = true }) {
-  const { width: windowWidth } = useWindowDimensions();
-  const width = Math.min(windowWidth, maxContentWidth) - OUTER_PADDING;
+  const windowWidth = useReliableWindowWidth();
+  const fallbackWidth = Math.min(windowWidth, maxContentWidth) - OUTER_PADDING;
+  // The window-width formula assumes exact knowledge of every ancestor's padding —
+  // measuring the container itself is authoritative once it's available. Ignore a
+  // reported 0 (can happen from a layout pass while the tab is still transitioning
+  // in) rather than trusting it over a known-good fallback.
+  const [measuredWidth, setMeasuredWidth] = useState(null);
+  const width = measuredWidth > 0 ? measuredWidth : fallbackWidth;
   const containerRef = useRef(null);
   const dragState = useRef(null);
 
@@ -180,6 +202,7 @@ export default function LineChart({ data, labelFor, formatValue = formatMoney, z
       <View
         ref={containerRef}
         style={styles.container}
+        onLayout={(e) => setMeasuredWidth(e.nativeEvent.layout.width)}
         onStartShouldSetResponder={() => true}
         onMoveShouldSetResponder={() => true}
         onResponderGrant={handleGrant}
