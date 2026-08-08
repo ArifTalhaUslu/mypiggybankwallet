@@ -1,14 +1,15 @@
 import { Platform } from "react-native";
 import { getToken, clearToken, notifyUnauthorized } from "../state/auth";
 
-// Phone/Expo Go can't reach "localhost" (that's the phone itself). When phone and PC
-// are on the same LAN, LAN_IP works directly. When they can't reach each other (router
-// AP isolation, different subnets), TUNNEL_URL (a free Cloudflare quick tunnel pointing
-// at the backend) is used instead — set via `cloudflared tunnel --url http://localhost:4000`.
+// Live backend on Render — reachable from anywhere (phone, PC, web), no LAN/tunnel
+// juggling needed anymore. Flip USE_LOCAL to true while developing against a local
+// backend (`npm run dev` in backend/); phone/Expo Go still needs LAN_IP in that case
+// since "localhost" from the phone means the phone itself.
+const USE_LOCAL = false;
+const PROD_URL = "https://mypiggybankwallet.onrender.com/api";
 const LAN_IP = "192.168.1.7"; // your PC's current LAN IP — re-check with ipconfig if it changes
-const TUNNEL_URL = ""; // set to a live `cloudflared tunnel --url http://localhost:4000` URL when testing over LAN/phone
 
-const BASE_URL = TUNNEL_URL ? `${TUNNEL_URL}/api` : `http://${Platform.OS === "web" ? "localhost" : LAN_IP}:4000/api`;
+const BASE_URL = USE_LOCAL ? `http://${Platform.OS === "web" ? "localhost" : LAN_IP}:4000/api` : PROD_URL;
 
 async function request(path, options = {}) {
   const token = getToken();
