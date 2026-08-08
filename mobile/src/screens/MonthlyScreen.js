@@ -220,16 +220,18 @@ export default function MonthlyScreen() {
 
   // Keeps the selected month's card scrolled into view — on initial load, on arrow
   // navigation, and when tapping a card that's only partly visible at the edge.
-  // Uses the card's own scrollIntoView rather than setting the container's scrollLeft
-  // directly — RN Web's ScrollView otherwise stomps a manually-set offset back to 0
-  // on its next re-render.
-  useEffect(() => {
-    if (!month) return;
-    const t = setTimeout(() => {
-      cardRefs.current[month]?.scrollIntoView?.({ inline: "center", block: "nearest", behavior: "smooth" });
-    }, 50);
-    return () => clearTimeout(t);
-  }, [month]);
+  // useFocusEffect (not a plain useEffect) so this never fires while this tab is in
+  // the background — React Navigation keeps every tab mounted, and scrollIntoView on
+  // a hidden element was scrolling the whole page sideways on iOS Safari.
+  useFocusEffect(
+    useCallback(() => {
+      if (!month) return;
+      const t = setTimeout(() => {
+        cardRefs.current[month]?.scrollIntoView?.({ inline: "center", block: "nearest", behavior: "smooth" });
+      }, 50);
+      return () => clearTimeout(t);
+    }, [month])
+  );
 
   // On PC, a horizontal ScrollView only responds to touch/scrollbar drag by default —
   // add mouse wheel scrolling (smooth glide, not per-notch jumps) and click-drag
