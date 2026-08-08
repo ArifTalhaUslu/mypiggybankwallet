@@ -42,6 +42,11 @@ function useWebScrollbarStyle() {
       *::-webkit-scrollbar-thumb { background-color: ${colors.border}; border-radius: 8px; }
       *::-webkit-scrollbar-thumb:hover { background-color: ${colors.accent}; }
       html, body, #root { background-color: ${colors.bg}; }
+      /* iOS Safari can rubber-band-scroll the whole page sideways if the <html>
+         element itself isn't explicitly clipped (only clipping <body> isn't enough) —
+         that's what was shifting the entire layout left on iPhone. */
+      html { overflow-x: hidden; overscroll-behavior-x: none; }
+      body { overscroll-behavior-x: none; }
     `;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);
