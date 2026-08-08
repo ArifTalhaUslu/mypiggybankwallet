@@ -87,6 +87,7 @@ export default function PieChart({ segments }) {
                 {s.label}
               </Text>
               <Text style={styles.legendPct}>{s.pct.toFixed(0)}%</Text>
+              <Text style={styles.legendValue}>{formatMoney(s.value)} ₺</Text>
             </View>
           ))}
         </View>
@@ -98,12 +99,13 @@ export default function PieChart({ segments }) {
 const styles = StyleSheet.create({
   wrapper: { width: "100%" },
   row: { flexDirection: "row", alignItems: "center", gap: spacing.lg, flexWrap: "wrap" },
-  legend: { flex: 1, minWidth: 140, gap: 6 },
+  legend: { flex: 1, minWidth: 220, gap: 6 },
   legendRow: { flexDirection: "row", alignItems: "center", gap: 6, paddingVertical: 2 },
   dot: { width: 8, height: 8, borderRadius: 4 },
-  legendName: { color: colors.text, fontSize: 12, flex: 1 },
+  legendName: { color: colors.text, fontSize: 12, flex: 1, minWidth: 0 },
   legendNameActive: { color: colors.accent, fontWeight: "700" },
   legendPct: { color: colors.textDim, fontSize: 11, width: 34, textAlign: "right" },
+  legendValue: { color: colors.text, fontSize: 11, fontWeight: "600", width: 88, textAlign: "right" },
   centerTooltip: {
     position: "absolute",
     top: SIZE / 2 - 26,
