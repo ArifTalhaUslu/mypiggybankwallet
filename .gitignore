@@ -1,0 +1,18 @@
+node_modules/
+.env
+.env.*
+!.env.example
+
+# personal financial data — never commit this
+backend/data.json
+
+# expo / metro
+mobile/.expo/
+mobile/dist/
+mobile/web-build/
+mobile/*.log
+
+# misc
+*.log
+.DS_Store
+.claude/
