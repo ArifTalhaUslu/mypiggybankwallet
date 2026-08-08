@@ -34,6 +34,14 @@ export default function ConstantsScreen() {
     }, [load])
   );
 
+  // Modal portals to the document body on web, outside this screen's DOM — left open
+  // it would stay rendered on top of whichever tab you switch to next.
+  useFocusEffect(
+    useCallback(() => {
+      return () => setHistoryModalId(null);
+    }, [])
+  );
+
   const saveAmount = async (id) => {
     const amount = parseFloat((editingAmount[id] ?? "").replace(",", "."));
     if (Number.isNaN(amount)) return;

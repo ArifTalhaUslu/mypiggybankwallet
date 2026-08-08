@@ -15,7 +15,7 @@ const ZOOM_STEP = 0.7; // each +/- press or wheel notch shrinks/grows the window
 // Single-series time line: thin accent stroke, recessive gridlines, no per-point
 // clutter. Zoomable — wheel (desktop) or pinch (touch) to zoom, drag to pan once
 // zoomed in, tap/scrub to inspect a point via the crosshair tooltip.
-export default function LineChart({ data, labelFor, formatValue = formatMoney }) {
+export default function LineChart({ data, labelFor, formatValue = formatMoney, zoomable = true }) {
   const { width: windowWidth } = useWindowDimensions();
   const width = Math.min(windowWidth, maxContentWidth) - OUTER_PADDING;
   const containerRef = useRef(null);
@@ -63,7 +63,7 @@ export default function LineChart({ data, labelFor, formatValue = formatMoney })
 
   // Desktop mouse wheel zoom, centered on the cursor position.
   useEffect(() => {
-    if (Platform.OS !== "web" || data.length < 2) return;
+    if (!zoomable || Platform.OS !== "web" || data.length < 2) return;
     const node = containerRef.current?.getScrollableNode?.() ?? containerRef.current;
     if (!node) return;
     const handleWheel = (e) => {
@@ -116,7 +116,7 @@ export default function LineChart({ data, labelFor, formatValue = formatMoney })
 
   const handleGrant = (evt) => {
     const touches = evt.nativeEvent.touches;
-    if (touches && touches.length === 2) {
+    if (zoomable && touches && touches.length === 2) {
       const dist = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
       dragState.current = { pinchDist: dist, view };
       return;
@@ -132,7 +132,7 @@ export default function LineChart({ data, labelFor, formatValue = formatMoney })
 
   const handleMove = (evt) => {
     const touches = evt.nativeEvent.touches;
-    if (touches && touches.length === 2 && dragState.current?.pinchDist) {
+    if (zoomable && touches && touches.length === 2 && dragState.current?.pinchDist) {
       const dist = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
       const factor = dragState.current.pinchDist / Math.max(1, dist);
       const { start: s0, end: e0 } = dragState.current.view;
@@ -161,19 +161,21 @@ export default function LineChart({ data, labelFor, formatValue = formatMoney })
 
   return (
     <View style={styles.wrapper}>
-      <View style={styles.toolbar}>
-        <TouchableOpacity style={styles.zoomBtn} onPress={() => zoomAt((view.start + view.end) / 2, ZOOM_STEP)}>
-          <Text style={styles.zoomBtnText}>+</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.zoomBtn} onPress={() => zoomAt((view.start + view.end) / 2, 1 / ZOOM_STEP)}>
-          <Text style={styles.zoomBtnText}>−</Text>
-        </TouchableOpacity>
-        {isZoomed && (
-          <TouchableOpacity style={styles.resetBtn} onPress={resetZoom}>
-            <Text style={styles.resetBtnText}>Tümü</Text>
+      {zoomable && (
+        <View style={styles.toolbar}>
+          <TouchableOpacity style={styles.zoomBtn} onPress={() => zoomAt((view.start + view.end) / 2, ZOOM_STEP)}>
+            <Text style={styles.zoomBtnText}>+</Text>
           </TouchableOpacity>
-        )}
-      </View>
+          <TouchableOpacity style={styles.zoomBtn} onPress={() => zoomAt((view.start + view.end) / 2, 1 / ZOOM_STEP)}>
+            <Text style={styles.zoomBtnText}>−</Text>
+          </TouchableOpacity>
+          {isZoomed && (
+            <TouchableOpacity style={styles.resetBtn} onPress={resetZoom}>
+              <Text style={styles.resetBtnText}>Tümü</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
 
       <View
         ref={containerRef}

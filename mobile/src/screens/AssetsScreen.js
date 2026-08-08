@@ -171,14 +171,14 @@ export default function AssetsScreen() {
         />
         <View style={styles.entryRow}>
           <AmountInput
-            style={[styles.input, { flex: 1 }]}
+            style={[styles.input, { flex: 1, minWidth: 0 }]}
             placeholder="Miktar"
             placeholderTextColor={colors.textDim}
             value={newQuantity}
             onChangeText={setNewQuantity}
           />
           <AmountInput
-            style={[styles.input, { flex: 1 }]}
+            style={[styles.input, { flex: 1, minWidth: 0 }]}
             placeholder="Birim Fiyat"
             placeholderTextColor={colors.textDim}
             value={newUnitPrice}

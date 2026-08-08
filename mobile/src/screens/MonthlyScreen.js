@@ -126,6 +126,18 @@ export default function MonthlyScreen() {
     }, [])
   );
 
+  // RN's Modal portals straight to the document body on web, outside this screen's own
+  // DOM — so if left open while switching tabs, it stays rendered on top of whichever
+  // tab you land on. Close any open modal the moment this tab loses focus.
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        setConstantPickerVisible(false);
+        setConfirmVisible(false);
+      };
+    }, [])
+  );
+
   useFocusEffect(
     useCallback(() => {
       let cancelled = false;

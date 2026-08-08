@@ -152,7 +152,7 @@ export default function ReportScreen() {
       <AnimatedCard delay={100} style={[styles.chartCard, cardShadow]}>
         <Text style={styles.sectionLabel}>Aylık Toplam Gider — Zaman Çizelgesi</Text>
         {!loading && months.length >= 2 && (
-          <LineChart data={chartData} labelFor={(d) => formatMonthShort(d.month)} formatValue={(v) => `${formatMoney(v)} ₺`} />
+          <LineChart data={chartData} labelFor={(d) => formatMonthShort(d.month)} formatValue={(v) => `${formatMoney(v)} ₺`} zoomable={false} />
         )}
         {!loading && months.length < 2 && <Text style={styles.empty}>Grafik için en az 2 ay verisi gerekiyor.</Text>}
       </AnimatedCard>
