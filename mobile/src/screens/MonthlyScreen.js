@@ -617,6 +617,7 @@ const styles = StyleSheet.create({
   itemNameInput: {
     color: colors.text,
     flex: 1,
+    minWidth: 0,
     fontSize: 15,
     paddingVertical: 6,
     paddingHorizontal: spacing.sm,
@@ -673,6 +674,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm + 2,
     borderWidth: 1,
     borderColor: colors.border,
+    minWidth: 0,
   },
   addBtn: {
     backgroundColor: colors.accent,

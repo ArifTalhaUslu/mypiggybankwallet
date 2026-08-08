@@ -226,10 +226,10 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   entryHeader: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginBottom: spacing.sm },
-  nameInput: { color: colors.text, fontSize: 15, fontWeight: "700", flex: 1, padding: 0 },
+  nameInput: { color: colors.text, fontSize: 15, fontWeight: "700", flex: 1, minWidth: 0, padding: 0 },
   deleteBtn: { color: colors.danger, paddingHorizontal: 4, fontSize: 16 },
   entryRow: { flexDirection: "row", gap: spacing.sm },
-  entryField: { flex: 1 },
+  entryField: { flex: 1, minWidth: 0 },
   fieldLabel: { color: colors.textDim, fontSize: 11, marginBottom: 4 },
   entryValue: { color: colors.mint, fontWeight: "700", textAlign: "right", marginTop: spacing.sm },
   addCard: {
@@ -250,6 +250,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderWidth: 1,
     borderColor: colors.border,
+    minWidth: 0,
   },
   addBtn: {
     backgroundColor: colors.accent,

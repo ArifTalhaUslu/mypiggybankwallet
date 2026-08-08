@@ -47,6 +47,16 @@ function useWebScrollbarStyle() {
          that's what was shifting the entire layout left on iPhone. */
       html { overflow-x: hidden; overscroll-behavior-x: none; }
       body { overscroll-behavior-x: none; }
+      /* Touch targets render as plain divs on web — without this they show the text
+         cursor on hover, which reads as broken on a PC browser. */
+      /* react-native-web renders Touchable/Pressable as a div[tabindex="0"], not a
+         real button element — no role="button" to hook, so target tabindex instead. */
+      div[tabindex="0"] { cursor: pointer; }
+      input, textarea { cursor: text; }
+      /* Only color transitions, and only on touchables — charts drive their own
+         transform/opacity every pointer-move frame, so a blanket transition would
+         fight them and make dragging feel laggy. */
+      div[tabindex="0"] { transition: background-color 0.15s ease, border-color 0.15s ease; }
     `;
     document.head.appendChild(style);
     return () => document.head.removeChild(style);

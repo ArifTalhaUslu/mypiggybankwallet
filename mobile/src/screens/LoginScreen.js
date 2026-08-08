@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Animated } from "react-native";
 import { api } from "../api/client";
 import { saveToken } from "../state/auth";
 import { colors, radius, spacing, cardShadow } from "../theme";
@@ -8,6 +8,11 @@ export default function LoginScreen({ onLoggedIn }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const anim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.spring(anim, { toValue: 1, useNativeDriver: true, friction: 7, tension: 60 }).start();
+  }, [anim]);
 
   const submit = async () => {
     if (!password) return;
@@ -26,7 +31,13 @@ export default function LoginScreen({ onLoggedIn }) {
 
   return (
     <View style={styles.page}>
-      <View style={[styles.card, cardShadow]}>
+      <Animated.View
+        style={[
+          styles.card,
+          cardShadow,
+          { opacity: anim, transform: [{ scale: anim.interpolate({ inputRange: [0, 1], outputRange: [0.9, 1] }) }] },
+        ]}
+      >
         <Text style={styles.icon}>🐷</Text>
         <Text style={styles.title}>Piggybank</Text>
         <Text style={styles.subtitle}>Devam etmek için şifreni gir</Text>
@@ -47,7 +58,7 @@ export default function LoginScreen({ onLoggedIn }) {
         <TouchableOpacity style={styles.btn} onPress={submit} disabled={loading}>
           {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.btnText}>Giriş Yap</Text>}
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     </View>
   );
 }

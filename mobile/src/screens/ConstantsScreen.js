@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: spacing.sm, gap: spacing.sm },
-  nameInput: { color: colors.text, fontSize: 16, fontWeight: "700", flex: 1, padding: 0 },
+  nameInput: { color: colors.text, fontSize: 16, fontWeight: "700", flex: 1, minWidth: 0, padding: 0 },
   deleteBtn: { color: colors.danger, paddingHorizontal: 4, fontSize: 16 },
   editRow: { flexDirection: "row", gap: spacing.sm },
   saveBtn: {
@@ -208,6 +208,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     flex: 1,
+    minWidth: 0,
   },
   addBtn: {
     backgroundColor: colors.accent,

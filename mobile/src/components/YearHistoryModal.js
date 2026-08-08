@@ -113,6 +113,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     flex: 1,
+    minWidth: 0,
   },
   saveBtn: { backgroundColor: colors.accent, borderRadius: radius.sm, paddingHorizontal: spacing.lg, justifyContent: "center" },
   saveBtnText: { color: "#fff", fontWeight: "700" },
