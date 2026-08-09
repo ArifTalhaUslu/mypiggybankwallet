@@ -6,6 +6,7 @@ import Screen from "../components/Screen";
 import LineChart from "../components/LineChart";
 import PieChart from "../components/PieChart";
 import SelectModal from "../components/SelectModal";
+import { syncLiveAssetPrices } from "../state/assetsSync";
 import { colors, radius, spacing, cardShadow, CATEGORY_PALETTE } from "../theme";
 import { formatMoney, formatMonthShort, formatMonthLabel } from "../utils/format";
 
@@ -47,7 +48,7 @@ export default function ReportScreen() {
       setMonths(m);
       setBreakdown(b);
       setConstants(c);
-      setAssetEntries(a.entries);
+      setAssetEntries(await syncLiveAssetPrices(a.entries));
       const latest = m.length ? m[m.length - 1].month : null;
       setSelectedMonth((prev) => prev ?? latest);
     } catch (e) {

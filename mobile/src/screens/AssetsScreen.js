@@ -5,6 +5,7 @@ import { api } from "../api/client";
 import Screen from "../components/Screen";
 import AmountInput from "../components/AmountInput";
 import SelectModal from "../components/SelectModal";
+import { syncLiveAssetPrices } from "../state/assetsSync";
 import { colors, radius, spacing, cardShadow, CATEGORY_PALETTE as PALETTE } from "../theme";
 import { formatMoney } from "../utils/format";
 
@@ -27,17 +28,7 @@ export default function AssetsScreen() {
       const doc = await api.getAssets();
       const prices = await api.getPrices().catch(() => []);
       setPriceList(prices);
-
-      // Live-linked entries stay in sync with the market feed, no manual edits needed —
-      // apply the fresh price to what's shown right away, and persist it in the background.
-      const freshEntries = doc.entries.map((entry) => {
-        if (!entry.priceSource) return entry;
-        const live = prices.find((p) => p.kind === entry.priceSource.kind && p.code === entry.priceSource.code);
-        if (!live || live.buy === entry.unitPrice) return entry;
-        api.updateAssetEntry(entry._id, { unitPrice: live.buy }).catch(() => {});
-        return { ...entry, unitPrice: live.buy };
-      });
-      setEntries(freshEntries);
+      setEntries(await syncLiveAssetPrices(doc.entries, prices));
     } catch (e) {
       Alert.alert("Hata", "Backend'e ulaşılamadı: " + e.message);
     } finally {
