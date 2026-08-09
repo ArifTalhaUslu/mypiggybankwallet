@@ -14,10 +14,10 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/entries", async (req, res) => {
-  const { name, quantity, unitPrice } = req.body;
+  const { name, quantity, unitPrice, priceSource } = req.body;
   if (!name || !name.trim()) return res.status(400).json({ error: "name is required" });
   const doc = await getSingleton();
-  doc.entries.push({ name: name.trim(), quantity: quantity ?? 0, unitPrice: unitPrice ?? 0 });
+  doc.entries.push({ name: name.trim(), quantity: quantity ?? 0, unitPrice: unitPrice ?? 0, priceSource: priceSource ?? null });
   await doc.save();
   res.status(201).json(doc);
 });
@@ -27,10 +27,11 @@ router.put("/entries/:id", async (req, res) => {
   const entry = doc.entries.id(req.params.id);
   if (!entry) return res.status(404).json({ error: "entry not found" });
 
-  const { name, quantity, unitPrice } = req.body;
+  const { name, quantity, unitPrice, priceSource } = req.body;
   if (name !== undefined) entry.name = name;
   if (quantity !== undefined) entry.quantity = quantity;
   if (unitPrice !== undefined) entry.unitPrice = unitPrice;
+  if (priceSource !== undefined) entry.priceSource = priceSource;
 
   await doc.save();
   res.json(doc);

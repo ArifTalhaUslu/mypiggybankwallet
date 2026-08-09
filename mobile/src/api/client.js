@@ -58,4 +58,6 @@ export const api = {
   addAssetEntry: (entry) => request("/assets/entries", { method: "POST", body: JSON.stringify(entry) }),
   updateAssetEntry: (id, patch) => request(`/assets/entries/${id}`, { method: "PUT", body: JSON.stringify(patch) }),
   deleteAssetEntry: (id) => request(`/assets/entries/${id}`, { method: "DELETE" }),
+
+  getPrices: () => request("/prices"),
 };

@@ -7,6 +7,7 @@ import authRouter from "./routes/auth.js";
 import constantsRouter from "./routes/constants.js";
 import monthsRouter from "./routes/months.js";
 import assetsRouter from "./routes/assets.js";
+import pricesRouter from "./routes/prices.js";
 import { requireAuth } from "./middleware/auth.js";
 
 const app = express();
@@ -23,6 +24,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/constants", requireAuth, constantsRouter);
 app.use("/api/months", requireAuth, monthsRouter);
 app.use("/api/assets", requireAuth, assetsRouter);
+app.use("/api/prices", requireAuth, pricesRouter);
 
 const PORT = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/piggybank";
