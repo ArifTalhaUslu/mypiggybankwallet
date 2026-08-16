@@ -632,7 +632,12 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: spacing.sm,
     borderRadius: radius.sm,
-    minWidth: 90,
+    // A fixed width, not just minWidth — an <input>'s own intrinsic sizing (which
+    // minWidth alone doesn't override) grows with font-size, and at the 16px iOS needs
+    // to avoid auto-zoom, that intrinsic width alone was crushing the name field next
+    // to it down to 1-2 visible characters.
+    width: 92,
+    flexShrink: 0,
   },
   deleteBtn: { color: colors.danger, paddingHorizontal: 4, fontSize: 16 },
   empty: { color: colors.textDim, textAlign: "center" },
